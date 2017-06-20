@@ -4,41 +4,62 @@
 
 endpoint="https://api.ng.bluemix.net"
 org="leighw@us.ibm.com"
-space="dev"
+defaultspace="dev"
 apiKeyFile="apiKey-1.json"
 log_file="bmxadmin.log"
 
 inputfile=$1
 
+echo " " > $log_file # initialize & clear the log file
+echo "Starting script" 2>&1 | tee -a $log_file
+echo " " 2>&1 | tee -a $log_file
+
 if [[ -n "$inputfile" ]]; then
 	# a filename was passed in as the argument to the script; use the passed in filename
-	echo "inputfile is: " $inputfile
+	echo "inputfile is: " $inputfile 2>&1 | tee -a $log_file
+	echo " " 2>&1 | tee -a $log_file
 else
 	# no filename was passed in; use the default input filename
 	inputfile="bmxadmin.csv"
-    echo "using default input file: " $inputfile
+    echo "using default input file: " $inputfile 2>&1 | tee -a $log_file
+	echo " " 2>&1 | tee -a $log_file
 fi
 
-echo "executing: bx api " $endpoint
-bx api $endpoint
+echo "Setting CLI endpoint..." $endpoint
+bx api $endpoint  >> $log_file
+echo "  "  2>&1 | tee -a $log_file
 
-echo "executing: bx login --apikey " $apiKeyFile
-bx login --apikey @$apiKeyFile -s $space
+echo "Logging in using: " $apiKeyFile 2>&1 | tee -a $log_file
+bx login --apikey @$apiKeyFile -s $defaultspace  >> $log_file
+echo "  "  2>&1 | tee -a $log_file
 
-echo "executing: list existing users"
-bx iam space-users $org $space
+echo "List existing users for organization: " $org >> $log_file
+bx iam org-users $org >> $log_file
+echo "  "  >> $log_file
 
+echo "Reading input file " $inputfile "..." 2>&1 | tee -a $log_file
+echo "  "  2>&1 | tee -a $log_file
 IFS=","
-while read f1 f2 f3
+while read name space role eol
 do
-        echo "username is: $f1"
-        echo "space  is  : $f2"
-        echo "role   is  : $f3"
-		if [ "$f1" != "username" ] # skip the csv file header line
+		if [ "$name" != "username" ] # skip the csv file header line
 		then 
-			echo "executing: bx iam org-user-add $f1 $org"
-			bx iam org-user-add $f1 $org
+		 	echo "Processing username: $name; space: $space; role: $role" 2>&1 | tee -a $log_file
+			echo "executing: bx iam org-user-add $name $org" >> $log_file
+			bx iam org-user-add $name $org  >> $log_file
+
+			echo "executing: bx iam space-role-set $name $org $space $role" >> $log_file
+			bx iam space-role-set $name $org $space $role >> $log_file
 		else
-			echo "Skipping cvs file header line"
+			echo " " >> $log_file
+			echo "Skipping cvs file header line" >> $log_file
+			echo " " >> $log_file
 		fi
 done < $inputfile
+
+echo "  "  2>&1 | tee -a $log_file
+echo "Resulting list of users for organization: " $org >> $log_file
+bx iam org-users $org >> $log_file
+echo " " >> $log_file
+echo "Script complete!" 2>&1 | tee -a $log_file
+echo "Look in $log_file file for details of script execution."
