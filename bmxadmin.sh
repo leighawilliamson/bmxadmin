@@ -7,7 +7,7 @@ org="leighw@us.ibm.com"
 defaultspace="dev"
 apiKeyFile="apiKey-1.json"
 log_file="bmxadmin.log"
-
+teststr = ""
 inputfile=$1
 
 echo " " > $log_file # initialize & clear the log file
@@ -40,16 +40,16 @@ echo "  "  >> $log_file
 echo "Reading input file " $inputfile "..." 2>&1 | tee -a $log_file
 echo "  "  2>&1 | tee -a $log_file
 IFS=","
-while read name space role eol
+while read name space role
 do
 		if [ "$name" != "username" ] # skip the csv file header line
 		then 
-		 	echo "Processing username: $name; space: $space; role: $role" 2>&1 | tee -a $log_file
+		 	echo "Processing username: $name; space: $space; role: " ${role%?} 2>&1 | tee -a $log_file
 			echo "executing: bx iam org-user-add $name $org" >> $log_file
 			bx iam org-user-add $name $org  >> $log_file
 
-			echo "executing: bx iam space-role-set $name $org $space $role" >> $log_file
-			bx iam space-role-set $name $org $space $role >> $log_file
+			echo "executing: bx iam space-role-set $name $org $space " ${role%?} >> $log_file
+			bx iam space-role-set $name $org $space ${role%?} >> $log_file
 		else
 			echo " " >> $log_file
 			echo "Skipping cvs file header line" >> $log_file
