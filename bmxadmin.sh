@@ -4,11 +4,11 @@
 
 # set default values to be used if no alternative is passed in on the command line
 endpoint="https://api.ng.bluemix.net"
-org="leighw@us.ibm.com"
+org="myOrg"
 loginspace="dev"
-apiKeyFile="apiKey-1.json"
+apiKeyFile="myApiKey.json"
 log_file="bmxadmin.log"
-inputfile="bmxadmin.csv"
+inputfile="example.csv"
 
 # parse any arguments passed in on the command line
 while getopts e:l:a:o:s:f: option
