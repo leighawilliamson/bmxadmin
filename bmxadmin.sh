@@ -1,36 +1,50 @@
 #!/bin/bash
 # requires the Bluemix CLI which can be downloaded from http://clis.ng.bluemix.net/ui/home.html
-# first argument is Bluemix "endpoint" - the URL for Bluemix
+# requires use of an APIKey to login to Bluemix: https://console.bluemix.net/iam/?env_id=ibm:yp:us-south#/apikeys
 
+# set default values to be used if no alternative is passed in on the command line
 endpoint="https://api.ng.bluemix.net"
 org="leighw@us.ibm.com"
-defaultspace="dev"
+loginspace="dev"
 apiKeyFile="apiKey-1.json"
 log_file="bmxadmin.log"
-teststr = ""
-inputfile=$1
+inputfile="bmxadmin.csv"
 
-echo " " > $log_file # initialize & clear the log file
+# parse any arguments passed in on the command line
+while getopts e:l:a:o:s:f: option
+do
+ case "${option}"
+ in
+ e) endpoint=${OPTARG};;
+ l) log_file=${OPTARG};;
+ a) apiKeyFile=${OPTARG};;
+ o) org=${OPTARG};;
+ s) loginspace=${OPTARG};;
+ f) inputfile=$OPTARG;;
+ esac
+done
+
+# initialize & clear the log file
+echo " " > $log_file 
 echo "Starting script" 2>&1 | tee -a $log_file
 echo " " 2>&1 | tee -a $log_file
 
-if [[ -n "$inputfile" ]]; then
-	# a filename was passed in as the argument to the script; use the passed in filename
-	echo "inputfile is: " $inputfile 2>&1 | tee -a $log_file
-	echo " " 2>&1 | tee -a $log_file
-else
-	# no filename was passed in; use the default input filename
-	inputfile="bmxadmin.csv"
-    echo "using default input file: " $inputfile 2>&1 | tee -a $log_file
-	echo " " 2>&1 | tee -a $log_file
-fi
+# log the environment used for this execution of the script
+echo "Values used in this run of the script:" 2>&1 | tee -a $log_file
+echo "Endpoint: $endpoint" 2>&1 | tee -a $log_file
+echo "Log file: $log_file" 2>&1 | tee -a $log_file
+echo "ApiKey file: $apiKeyFile" 2>&1 | tee -a $log_file
+echo "Space used to login: $loginspace" 2>&1 | tee -a $log_file
+echo "Organization: $org" 2>&1 | tee -a $log_file
+echo "Input csv file: $inputfile" 2>&1 | tee -a $log_file
+echo " " 2>&1 | tee -a $log_file
 
 echo "Setting CLI endpoint..." $endpoint
 bx api $endpoint  >> $log_file
 echo "  "  2>&1 | tee -a $log_file
 
 echo "Logging in using: " $apiKeyFile 2>&1 | tee -a $log_file
-bx login --apikey @$apiKeyFile -s $defaultspace  >> $log_file
+bx login --apikey @$apiKeyFile -s $loginspace  >> $log_file
 echo "  "  2>&1 | tee -a $log_file
 
 echo "List existing users for organization: " $org >> $log_file
