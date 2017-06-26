@@ -8,10 +8,12 @@ The script processes each row in the file and ensures that the user is
 added to the organization in Bluemix and is assigned the desired role in the 
 designated Bluemix space.
 
+The detailed output from all commands executed by this script is stored in a log file that you can inspect after the script completes in order to see the history of everything that happened.
+
 ## Dependencies
 
 The script some dependencies that you have to setup before using it:
-* the [Bluemix CLI](http://clis.ng.bluemix.net/ui/home.html) must be installed on the system where it runs
+* the [Bluemix CLI](http://clis.ng.bluemix.net/ui/home.html) must be installed on the system where this script runs
 * an [APIKey file](https://console.bluemix.net/iam/?env_id=ibm:yp:us-south#/apikeys) is required for the identity under which the script will log in to Bluemix and perform the tasks
 
 ## Using the script
@@ -26,14 +28,21 @@ can be overridden using option flags on the command line:
 * -l : override the default log file name used by this script
 * -a : override the default filename for the APIKey file used to login to Bluemix
 * -s : override the default Bluemix space where the script initially logs in
+* -h : display script command syntax
 
 ## Examples
 
 Run the script specifying an input csv file named "test.csv" and a log output file named "testlog.log"
 ```
-./bmxadmin.sh -l testlog.log -f test.csv
+$ ./bmxadmin.sh -l testlog.log -f test.csv
 ```
 Run the script specifying an APIKey file named "myAPIKey.json" and a login space of "dev"
 ```
-./bmxadmin.sh -a myAPIKey.json -s dev
+$ ./bmxadmin.sh -a myAPIKey.json -s dev
+```
+Get help for the syntax expected by the script
+```
+$ ./bmxadmin.sh -h
+usage: bmxadmin.sh [-h ] [-f <input csv file>] [-e <endpoint>] [-l <log file>] [-a <apiKey file>]
+ [-o <organization>] [-s <login space>]
 ```

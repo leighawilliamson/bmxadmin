@@ -1,4 +1,5 @@
 #!/bin/bash
+# author: Leigh Williamson, leighw@us.ibm.com
 # requires the Bluemix CLI which can be downloaded from http://clis.ng.bluemix.net/ui/home.html
 # requires use of an APIKey to login to Bluemix: https://console.bluemix.net/iam/?env_id=ibm:yp:us-south#/apikeys
 
@@ -9,12 +10,14 @@ loginspace="dev"
 apiKeyFile="myApiKey.json"
 log_file="bmxadmin.log"
 inputfile="example.csv"
+help=""
 
 # parse any arguments passed in on the command line
-while getopts e:l:a:o:s:f: option
+while getopts he:l:a:o:s:f: option
 do
  case "${option}"
  in
+ h) help="true";;
  e) endpoint=${OPTARG};;
  l) log_file=${OPTARG};;
  a) apiKeyFile=${OPTARG};;
@@ -23,6 +26,12 @@ do
  f) inputfile=$OPTARG;;
  esac
 done
+
+if [ $help = "true" ]
+then
+	echo "usage: bmxadmin.sh [-h ] [-f <input csv file>] [-e <endpoint>] [-l <log file>] [-a <apiKey file>] [-o <organization>] [-s <login space>]"
+	exit
+fi
 
 # initialize & clear the log file
 echo " " > $log_file 
